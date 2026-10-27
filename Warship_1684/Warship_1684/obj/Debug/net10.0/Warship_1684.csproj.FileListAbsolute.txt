@@ -1,0 +1,10 @@
+/var/home/DementedCrow/Desktop/code/c#/Warship_1684/Warship_1684/bin/Debug/net10.0/Warship_1684
+/var/home/DementedCrow/Desktop/code/c#/Warship_1684/Warship_1684/bin/Debug/net10.0/Warship_1684.dll
+/var/home/DementedCrow/Desktop/code/c#/Warship_1684/Warship_1684/bin/Debug/net10.0/Warship_1684.pdb
+/var/home/DementedCrow/Desktop/code/c#/Warship_1684/Warship_1684/obj/Debug/net10.0/Warship_1684.GeneratedMSBuildEditorConfig.editorconfig
+/var/home/DementedCrow/Desktop/code/c#/Warship_1684/Warship_1684/obj/Debug/net10.0/Warship_1684.AssemblyInfoInputs.cache
+/var/home/DementedCrow/Desktop/code/c#/Warship_1684/Warship_1684/obj/Debug/net10.0/Warship_1684.AssemblyInfo.cs
+/var/home/DementedCrow/Desktop/code/c#/Warship_1684/Warship_1684/obj/Debug/net10.0/Warship_1684.csproj.CoreCompileInputs.cache
+/var/home/DementedCrow/Desktop/code/c#/Warship_1684/Warship_1684/obj/Debug/net10.0/Warship_1684.dll
+/var/home/DementedCrow/Desktop/code/c#/Warship_1684/Warship_1684/obj/Debug/net10.0/refint/Warship_1684.dll
+/var/home/DementedCrow/Desktop/code/c#/Warship_1684/Warship_1684/obj/Debug/net10.0/Warship_1684.pdb

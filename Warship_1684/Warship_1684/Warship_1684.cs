@@ -1,28 +1,57 @@
-﻿namespace ship_test
+﻿namespace Warship_1684
 {
   public static class Globals
   {
     public static int MissileTransitFri = 0;
     public static int MissileTransitEne = 0;
     public static int Distance = 0;
-    public static Ship PlayerShip = new Ship();
+    public static int Speed = 0;
+    public static Ship PlayerShip  = new Ship();
+    public static Boolean MainLoop = false;
+    
+
+    public static void DistanceVisual()
+    {
+      int displayDist = Distance / 2500000;
+      string stringDist = string.Concat(Enumerable.Repeat("-", displayDist));
+      Console.WriteLine(">" + stringDist + "<");
+    }
   }
   public class Ship
   {
-    private int _structure = 100;
-    private int _armor = 1500;
-    private int _acceleration = 1960;
-    private int _heatDissipation = 14;
-    private int _heat = 0;
-    private Boolean _engine =  true;
-    private Boolean _reactor = true;
-    private Boolean _radiator = true;
-    private Boolean _cic = true;
-    private Boolean _ammoFeed = true;
-    private GunType _gunType = GunType.Coilgun;
-    private int _gunNumber = 5;
-    private int _missileNumber = 2;
+    protected int _structure = 1;
+    protected int _armor = 1;
+    protected int _acceleration = 1;
+    protected int _heatDissipation = 1;
+    protected int _heat = 0;
+    protected Boolean _engine = true;
+    protected Boolean _reactor = true;
+    protected Boolean _radiator = true;
+    protected Boolean _cic = true;
+    protected Boolean _ammoFeed = true;
+    protected GunType _gunType = GunType.Null;
+    protected int _gunNumber = 1;
+    protected int _missileNumber = 1;
 
+    public void ChangeStats(String shipClass)
+    {
+      if (shipClass == "Destroyer")
+      {
+        _structure = 100;
+        _armor = 1500;
+        _acceleration = 1960;
+        _heatDissipation = 14;
+        _heat = 0;
+        _engine = true;
+        _reactor = true;
+        _radiator = true;
+        _cic = true;
+        _ammoFeed = true;
+        _gunType = GunType.Coilgun;
+        _gunNumber = 5;
+        _missileNumber = 2;
+      }
+    }
     public int Hit(int numRounds, string gun)
     {
       int damage = 0;
@@ -158,8 +187,11 @@
         shipSelection = Console.ReadLine();
         if (shipSelection == "Destroyer")
         {
-          Globals.PlayerShip = new Ship();
+          Globals.PlayerShip.ChangeStats("Destroyer");
           Console.WriteLine("Your ship has been set to: Destroyer");
+          Globals.Distance = 100000000;
+          Console.WriteLine("Dev: Distance has been set to 100000 KM. Main game loop starting.");
+          Globals.MainLoop = true;
         }
         else
         {
@@ -167,15 +199,30 @@
           shipSelection = "Null";
         }
       }
+      while (Globals.MainLoop == true)
+      {
+        Globals.DistanceVisual();
+        string playSelection = "Null";
+        playSelection = Console.ReadLine();
+        if (playSelection == "exit")
+        {
+          Globals.MainLoop = false;
+        }
+        else if (playSelection == "Move+")
+        {
+          Globals.PlayerShip.GetAcceleration();
+        }
+      }
     }
   }
-  enum GunType 
+  public enum GunType 
   {
     Coilgun,
     Railgun,
     Ureb,
     Laser,
     Macron,
-    Shredgun
+    Shredgun,
+    Null
   }
 }

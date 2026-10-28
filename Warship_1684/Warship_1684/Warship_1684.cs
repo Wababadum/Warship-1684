@@ -1,20 +1,56 @@
-﻿namespace Warship_1684
+﻿using System.Security.Cryptography;
+
+namespace Warship_1684
 {
   public static class Globals
   {
     public static int MissileTransitFri = 0;
     public static int MissileTransitEne = 0;
+    public static int TruDist = Math.Abs(Distance);
     public static int Distance = 0;
     public static int Speed = 0;
     public static Ship PlayerShip  = new Ship();
     public static Boolean MainLoop = false;
+    public static int EnemyShipHealth = 10000;
     
-
     public static void DistanceVisual()
     {
-      int displayDist = Distance / 2500000;
+      int displayDist = TruDist / 2500000;
       string stringDist = string.Concat(Enumerable.Repeat("-", displayDist));
       Console.WriteLine(">" + stringDist + "<");
+    }
+    public static int EnemyHit(int numRounds, string gun)
+    {
+      int damage = 0;
+      if (gun == "Coilgun")
+      {
+        damage = numRounds * 3;
+      }
+      else if (gun == "Railgun")
+      {
+        damage = numRounds * 9;
+      }
+      else if (gun == "Ureb")
+      {
+        damage = numRounds * 27;
+      }
+      else if (gun == "Laser")
+      {
+        damage = numRounds * 5;
+      }
+      else if (gun == "Macron")
+      {
+        damage = numRounds * 21;
+      }
+      else if (gun == "Shredgun")
+      {
+        damage = numRounds * 13;
+      }
+      return damage;
+    }
+    public static void DistanceChange()
+    {
+      Distance += Speed;
     }
   }
   public class Ship
@@ -39,7 +75,7 @@
       {
         _structure = 100;
         _armor = 1500;
-        _acceleration = 1960;
+        _acceleration = 5880;
         _heatDissipation = 14;
         _heat = 0;
         _engine = true;
@@ -47,11 +83,44 @@
         _radiator = true;
         _cic = true;
         _ammoFeed = true;
-        _gunType = GunType.Coilgun;
-        _gunNumber = 5;
+        _gunType = GunType.Railgun;
+        _gunNumber = 3;
         _missileNumber = 2;
       }
-    }
+      else if (shipClass == "Corvette")
+      {
+        _structure = 85;
+        _armor = 1000;
+        _acceleration = 5880;
+        _heatDissipation = 9;
+        _heat = 0;
+        _engine = true;
+        _reactor = true;
+        _radiator = true;
+        _cic = true;
+        _ammoFeed = true;
+        _gunType = GunType.Coilgun;
+        _gunNumber = 3;
+        _missileNumber = 0;
+      }
+      else if (shipClass == "Cruiser")
+      {
+        _structure = 350;
+        _armor = 4000;
+        _acceleration = 7290;
+        _heatDissipation = 23;
+        _heat = 0;
+        _engine = true;
+        _reactor = true;
+        _radiator = true;
+        _cic = true;
+        _ammoFeed = true;
+        _gunType = GunType.Ureb;
+        _gunNumber = 8;
+        _missileNumber = 12;
+      }
+    
+  }
     public int Hit(int numRounds, string gun)
     {
       int damage = 0;
@@ -117,17 +186,48 @@
       }
       if (_gunType == GunType.Coilgun)
       {
-        if (distance > 35000)
+        if (distance > 35000000) // 35,000 KM
         {
           shots = 0;
         }
-        else if (distance <= 35000)
+        else if (distance <= 35000000)
         {
-          float x = distance / 70000;
+          float x = distance / 70000000; // 70,000 KM
           float hitPercent = 1 - x;
           float shotsPercent = (_gunNumber * (58 / ammoMod)) * hitPercent;
           shots = (int)shotsPercent;
         }
+        _heat += _gunNumber * 2;
+      }
+      else if (_gunType == GunType.Railgun)
+      {
+        if (distance > 50000000) // 50,000 KM
+        {
+          shots = 0;
+        }
+        else if (distance <= 50000000)
+        {
+          float x = distance / 100000000; // 100,000 KM
+          float hitPercent = 1 - x;
+          float shotsPercent = (_gunNumber * (10 / ammoMod)) * hitPercent;
+          shots = (int)shotsPercent;
+        }
+        _heat += _gunNumber * 3;
+      }
+      else if (_gunType == GunType.Ureb)
+      {
+        if (distance > 1000000000) // 1,000,000 KM
+        {
+          shots = 0;
+        }
+        else if (distance <= 800000000) // 800,000 KM
+        {
+          float x = distance / 1200000000; // 1,200,000 KM
+          float hitPercent = 1 - x;
+          float shotsPercent = (_gunNumber * (10 / ammoMod)) * hitPercent;
+          shots = (int)shotsPercent;
+        }
+        _heat += _gunNumber * 3;
       }
       if (_reactor == false)
       {
@@ -139,7 +239,7 @@
       }
       return shots;
     }
-    public int DissipateHeat()
+    public void DissipateHeat()
     {
       int newHeat = 0;
       if (_radiator == false)
@@ -159,7 +259,7 @@
           newHeat = 0;
         }
       }
-      return newHeat;
+      _heat = newHeat;
     }
     public int FireMissile(int missileNum)
     {
@@ -167,8 +267,18 @@
       {
         missileNum = _missileNumber;
       }
-      Globals.MissileTransitFri = Globals.MissileTransitFri + missileNum;
+      Globals.MissileTransitFri += missileNum;
+      _heat += missileNum;
       return 0;
+    }
+    public string GetGun()
+    {
+      string gun = "Null";
+      if (_gunType == GunType.Coilgun)
+      {
+        gun = "Coilgun";
+      }
+      return gun;
     }
   }
 
@@ -188,9 +298,25 @@
         if (shipSelection == "Destroyer")
         {
           Globals.PlayerShip.ChangeStats("Destroyer");
-          Console.WriteLine("Your ship has been set to: Destroyer");
-          Globals.Distance = 100000000;
-          Console.WriteLine("Dev: Distance has been set to 100000 KM. Main game loop starting.");
+          Console.WriteLine($"Your ship has been set to: {shipSelection}");
+          Globals.Distance = 50000000;
+          Console.WriteLine("Dev: Distance has been set to 50000 KM or 50000000 meters. Main game loop starting.");
+          Globals.MainLoop = true;
+        }
+        else if (shipSelection == "Corvette")
+        {
+          Globals.PlayerShip.ChangeStats("Corvette");
+          Console.WriteLine($"Your ship has been set to: {shipSelection}");
+          Globals.Distance = 50000000;
+          Console.WriteLine("Dev: Distance has been set to 50000 KM or 50000000 meters. Main game loop starting.");
+          Globals.MainLoop = true;
+        }
+        else if (shipSelection == "Cruiser")
+        {
+          Globals.PlayerShip.ChangeStats("Cruiser");
+          Console.WriteLine($"Your ship has been set to: {shipSelection}");
+          Globals.Distance = 50000000;
+          Console.WriteLine("Dev: Distance has been set to 50000 KM or 50000000 meters. Main game loop starting.");
           Globals.MainLoop = true;
         }
         else
@@ -201,6 +327,8 @@
       }
       while (Globals.MainLoop == true)
       {
+        Globals.TruDist = Math.Abs(Globals.Distance);
+        Console.WriteLine(Globals.TruDist);
         Globals.DistanceVisual();
         string playSelection = "Null";
         playSelection = Console.ReadLine();
@@ -210,8 +338,23 @@
         }
         else if (playSelection == "Move+")
         {
-          Globals.PlayerShip.GetAcceleration();
+          int moveVal = Globals.PlayerShip.GetAcceleration();
+          Globals.Speed += moveVal;
         }
+        else if (playSelection == "Move-")
+        {
+          int moveVal = Globals.PlayerShip.GetAcceleration();
+          Globals.Speed -= moveVal;
+        }
+        else if (playSelection == "Fire")
+        {
+          int shotsToEnemy = Globals.PlayerShip.Shoot(Globals.TruDist);
+          int damageToEnemy =Globals.EnemyHit(shotsToEnemy, Globals.PlayerShip.GetGun());
+          Globals.EnemyShipHealth -= damageToEnemy;
+          Console.WriteLine("Enemy health is: " + Globals.EnemyShipHealth);
+        }
+        Globals.DistanceChange();
+        Globals.PlayerShip.DissipateHeat();
       }
     }
   }

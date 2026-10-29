@@ -130,29 +130,28 @@ namespace Warship_1684
     public int Hit(int numRounds, string gun)
     {
       int damage = 0;
-      if (gun == "Coilgun")
+      switch(gun)
       {
-        damage = numRounds * 3;
-      }
-      else if (gun == "Railgun")
-      {
-        damage = numRounds * 9;
-      }
-      else if (gun == "Ureb")
-      {
-        damage = numRounds * 27;
-      }
-      else if (gun == "Laser")
-      {
-        damage = numRounds * 5;
-      }
-      else if (gun == "Macron")
-      {
-        damage = numRounds * 21;
-      }
-      else if (gun == "Shredgun")
-      {
-        damage = numRounds * 13;
+        case "Coilgun":
+          damage = numRounds * 3;
+          break;
+        case "Railgun":
+          damage = numRounds * 9;
+          break;
+        case "Ureb":
+          damage = numRounds * 27;
+          break;
+        case "Laser":
+          damage = numRounds * 5;
+          break;
+        case "Macron":
+          damage = numRounds * 21;
+          break;
+        case "Shredgun":
+          damage = numRounds * 13;
+          break;
+        //case default:
+         // Console.WriteLine("Invalid gun type. Error 700.");
       }
       _structure = _structure - damage;
       return _structure;
@@ -190,50 +189,52 @@ namespace Warship_1684
       {
         ammoMod = 2;
       }
-      if (_gunType == GunType.Coilgun)
+      switch (_gunType)
       {
-        if (distance > 35000000) // 35,000 KM
-        {
-          shots = 0;
-        }
-        else if (distance <= 35000000)
-        {
-          float x = distance / 70000000; // 70,000 KM
-          float hitPercent = 1 - x;
-          float shotsPercent = (_gunNumber * (58 / ammoMod)) * hitPercent;
-          shots = (int)shotsPercent;
-        }
-        _heat += _gunNumber * 2;
-      }
-      else if (_gunType == GunType.Railgun)
-      {
-        if (distance > 50000000) // 50,000 KM
-        {
-          shots = 0;
-        }
-        else if (distance <= 50000000)
-        {
-          float x = distance / 100000000; // 100,000 KM
-          float hitPercent = 1 - x;
-          float shotsPercent = (_gunNumber * (10 / ammoMod)) * hitPercent;
-          shots = (int)shotsPercent;
-        }
-        _heat += _gunNumber * 3;
-      }
-      else if (_gunType == GunType.Ureb)
-      {
-        if (distance > 1000000000) // 1,000,000 KM
-        {
-          shots = 0;
-        }
-        else if (distance <= 800000000) // 800,000 KM
-        {
-          float x = distance / 1200000000; // 1,200,000 KM
-          float hitPercent = 1 - x;
-          float shotsPercent = (_gunNumber * (10 / ammoMod)) * hitPercent;
-          shots = (int)shotsPercent;
-        }
-        _heat += _gunNumber * 3;
+        case GunType.Coilgun:
+          if (distance > 35000000) // 35,000 KM
+          {
+           shots = 0;
+          }
+          else if (distance <= 35000000)
+          {
+            float x = distance / 70000000; // 70,000 KM
+            float hitPercent = 1 - x;
+            float shotsPercent = (_gunNumber * (58 / ammoMod)) * hitPercent;
+            shots = (int)shotsPercent;
+          }
+          _heat += _gunNumber * 2;
+          break;
+        case GunType.Railgun:
+          if (distance > 50000000) // 50,000 KM
+          {
+            shots = 0;
+          }
+          else if (distance <= 50000000)
+          {
+            float x = distance / 100000000; // 100,000 KM
+            float hitPercent = 1 - x;
+            float shotsPercent = (_gunNumber * (10 / ammoMod)) * hitPercent;
+            shots = (int)shotsPercent;
+          }
+          _heat += _gunNumber * 3;
+          break;
+        case GunType.Ureb:
+          if (distance > 1000000000) // 1,000,000 KM
+          {
+            shots = 0;
+          }
+          else if (distance <= 800000000) // 800,000 KM
+          {
+            float x = distance / 1200000000; // 1,200,000 KM
+            float hitPercent = 1 - x;
+            float shotsPercent = (_gunNumber * (10 / ammoMod)) * hitPercent;
+            shots = (int)shotsPercent;
+          }
+          _heat += _gunNumber * 3;
+          break;
+        //case default:
+          //Console.WriteLine("Invalid _gunType or GunType. Error 700.");
       }
       if (_reactor == false)
       {
@@ -279,17 +280,20 @@ namespace Warship_1684
     public string GetGun()
     {
       string gun = "Null";
-      if (_gunType == GunType.Coilgun)
+      switch (_gunType)
       {
-        gun = "Coilgun";
-      }
-      else if (_gunType == GunType.Railgun)
-      {
-        gun = "Railgun";
-      }
-      else if (_gunType == GunType.Ureb)
-      {
-        gun = "Ureb";
+        case GunType.Coilgun:
+          gun = "Coilgun";
+          break;
+        case GunType.Railgun:
+          gun = "Railgun";
+          break;
+        case GunType.Ureb:
+          gun = "Ureb";
+          break;
+        //case default:
+          //Console.WriteLine("Invalid _gunType or GunType. Error 700.");
+          //break;
       }
       return gun;
     }
@@ -375,6 +379,7 @@ namespace Warship_1684
           Console.WriteLine(Globals.EnemyShipHealth);
         }
         Globals.MissileResolve();
+        Console.WriteLine($"The enemy ship is at {Globals.EnemyShipHealth} health");
         Globals.DistanceChange();
         Globals.PlayerShip.DissipateHeat();
       }

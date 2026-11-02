@@ -2,23 +2,39 @@
 
 namespace Warship_1684
 {
-  public static class Globals
+  public static partial class Enumerable
+  {
+    public static IEnumerable<TResult> Repeat<TResult>(TResult element, double count) //this some bullshit
+    {
+       if (count < 0)
+       {
+          ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.count);
+       }
+       if (count == 0)
+       {
+          return Empty<TResult>();                      // I swear to god I'm going to commit a crime
+       }
+       return new RepeatIterator<TResult>(element, count);
+      }
+    }
+  public static class Globals //variables should use camelCase
   {
     public static int MissileTransitFri = 0;
     public static int MissileTransitEne = 0;
-    public static int TruDist = Math.Abs(Distance);
-    public static int Distance = 0;
+    public static long TruDist = Math.Abs(Distance);
+    public static long Distance = 0;
     public static int Speed = 0;
     public static Ship PlayerShip  = new Ship();
-    public static Boolean MainLoop = false;
+    public static bool MainLoop = false;
     public static int EnemyShipHealth = 10000;
+    public static bool ConstAcceleration;
     public static void DistanceVisual()
     {
-      int displayDist = TruDist / 2500000;
-      string stringDist = string.Concat(Enumerable.Repeat("-", displayDist));
+      long displayDist = TruDist / 500000;
+      string stringDist = string.Concat(Enumerable.Repeat("-", displayDist)); //use a for loop instead man
       Console.WriteLine(">" + stringDist + "<");
     }
-    public static void EnemyHit(int numRounds, string gun)
+    public static void EnemyHit(int numRounds, string gun) //make enum
     {
       int damage = 0;
       if (gun == "Coilgun")
@@ -59,6 +75,10 @@ namespace Warship_1684
         EnemyShipHealth = EnemyShipHealth - damage; // NEEDS MORE FIXING TO MAKE FUNCTIONAL
         MissileTransitFri = 0;
       }
+    }
+    public static void ConstAccel(int accelVal)
+    {
+      Speed = Speed + accelVal; // Speed += accelVal
     }
   }
   public class Ship
@@ -127,6 +147,13 @@ namespace Warship_1684
         _missileNumber = 12;
       }
   }
+
+    /// <summary> // <- USE THESE PLEASE
+    /// bleh
+    /// </summary>
+    /// <param name="numRounds"></param>
+    /// <param name="gun"></param>
+    /// <returns></returns>
     public int Hit(int numRounds, string gun)
     {
       int damage = 0;
@@ -181,7 +208,7 @@ namespace Warship_1684
       }
       return accel;
     }
-    public int Shoot(int distance)
+    public int Shoot(double distance)
     {
       int shots = 0;
       int ammoMod = 1;
@@ -198,7 +225,7 @@ namespace Warship_1684
           }
           else if (distance <= 35000000)
           {
-            float x = distance / 70000000; // 70,000 KM
+            float x = (float)distance / 70000000; // 70,000 KM
             float hitPercent = 1 - x;
             float shotsPercent = (_gunNumber * (58 / ammoMod)) * hitPercent;
             shots = (int)shotsPercent;
@@ -212,7 +239,7 @@ namespace Warship_1684
           }
           else if (distance <= 50000000)
           {
-            float x = distance / 100000000; // 100,000 KM
+            float x = (float)distance / 100000000; // 100,000 KM
             float hitPercent = 1 - x;
             float shotsPercent = (_gunNumber * (10 / ammoMod)) * hitPercent;
             shots = (int)shotsPercent;
@@ -226,7 +253,7 @@ namespace Warship_1684
           }
           else if (distance <= 800000000) // 800,000 KM
           {
-            float x = distance / 1200000000; // 1,200,000 KM
+            float x = (float)distance / 1200000000; // 1,200,000 KM
             float hitPercent = 1 - x;
             float shotsPercent = (_gunNumber * (10 / ammoMod)) * hitPercent;
             shots = (int)shotsPercent;
@@ -291,16 +318,31 @@ namespace Warship_1684
         case GunType.Ureb:
           gun = "Ureb";
           break;
-        //case default:
+        //case default: //i would uncomment this, it is a good habit to get into
           //Console.WriteLine("Invalid _gunType or GunType. Error 700.");
           //break;
       }
       return gun;
     }
+    public void BurnDirec(bool toward)
+    {
+      if (Globals.ConstAcceleration == true)
+      {
+        if (toward == true)
+        {
+          Globals.ConstAccel(_acceleration);
+        }
+        else
+        {
+          int negAccel = -_acceleration;
+          Globals.ConstAccel(negAccel);
+        }
+      }
+    }
   }
   class Program
   {
-    static void Main(string[] args)
+    static void Main(string[] args) //can always implement arguments
     {
       Console.WriteLine("|------------------------|");
       Console.WriteLine("|       Welcome to       |");
@@ -311,12 +353,12 @@ namespace Warship_1684
       {
         Console.WriteLine("Please Select Your Ship Class:");
         shipSelection = Console.ReadLine();
-        if (shipSelection == "Destroyer")
+        if (shipSelection == "Destroyer") // switch case statements would be better here
         {
           Globals.PlayerShip.ChangeStats("Destroyer");
           Console.WriteLine($"Your ship has been set to: {shipSelection}");
           Globals.Distance = 50000000;
-          Console.WriteLine("Dev: Distance has been set to 50000 KM or 50000000 meters. Main game loop starting.");
+          Console.WriteLine("Dev: Distance has been set to 50000 KM or 50000000 meters. Main game loop starting."); //you could add a public static bool dev for these, and check it with an if statement
           Globals.MainLoop = true;
         }
         else if (shipSelection == "Corvette")
@@ -347,37 +389,42 @@ namespace Warship_1684
         Console.WriteLine(Globals.TruDist);
         Globals.DistanceVisual();
         string playSelection = "Null";
+        bool burnDirec = true;
         playSelection = Console.ReadLine();
-        if (playSelection == "exit")
+        if (playSelection == "exit") //use a switch case
         {
           Globals.MainLoop = false;
         }
-        else if (playSelection == "Move+")
+        else if (playSelection == "Burn Far")
         {
-          int moveVal = Globals.PlayerShip.GetAcceleration();
-          Globals.Speed += moveVal;
+          Globals.ConstAcceleration = true;
+          burnDirec = true;
         }
-        else if (playSelection == "Move-")
+        else if (playSelection == "Burn Cls")
         {
-          int moveVal = Globals.PlayerShip.GetAcceleration();
-          Globals.Speed -= moveVal;
+          Globals.ConstAcceleration = true;
+          burnDirec = false;
+        }
+        else if (playSelection == "Cut Burn")
+        {
+          Globals.ConstAcceleration = false;
         }
         else if (playSelection == "Fire")
         {
           int shotsToEnemy = Globals.PlayerShip.Shoot(Globals.TruDist);
           Globals.EnemyHit(shotsToEnemy, Globals.PlayerShip.GetGun());
-          Console.WriteLine("Enemy health is: " + Globals.EnemyShipHealth);
         }
         else if (playSelection == "Missile")
         {
           Console.WriteLine("Number of Missiles to be fired: ");
           string missileAmount = Console.ReadLine();
           int missileAmountInt = int.Parse(missileAmount);
-          Globals.MissileTransitFri = missileAmountInt;
+          //Globals.MissileTransitFri = missileAmountInt;
           Globals.PlayerShip.FireMissile(missileAmountInt);
           Console.WriteLine($"Number of Missiles fired: {Globals.MissileTransitFri}");
           Console.WriteLine(Globals.EnemyShipHealth);
         }
+        Globals.PlayerShip.BurnDirec(burnDirec);
         Globals.MissileResolve();
         Console.WriteLine($"The enemy ship is at {Globals.EnemyShipHealth} health");
         Globals.DistanceChange();

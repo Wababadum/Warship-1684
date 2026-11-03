@@ -1,22 +1,7 @@
-﻿using System.Security.Cryptography;
-
+﻿using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 namespace Warship_1684
 {
-  public static partial class Enumerable
-  {
-    public static IEnumerable<TResult> Repeat<TResult>(TResult element, double count) //this some bullshit
-    {
-       if (count < 0)
-       {
-          ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.count);
-       }
-       if (count == 0)
-       {
-          return Empty<TResult>();                      // I swear to god I'm going to commit a crime
-       }
-       return new RepeatIterator<TResult>(element, count);
-      }
-    }
   public static class Globals //variables should use camelCase
   {
     public static int MissileTransitFri = 0;
@@ -31,7 +16,11 @@ namespace Warship_1684
     public static void DistanceVisual()
     {
       long displayDist = TruDist / 500000;
-      string stringDist = string.Concat(Enumerable.Repeat("-", displayDist)); //use a for loop instead man
+      string stringDist = ""; //use a for loop instead man
+      for (long count = displayDist; count > 0; count--)
+      {
+        stringDist = stringDist + "-";
+      }
       Console.WriteLine(">" + stringDist + "<");
     }
     public static void EnemyHit(int numRounds, string gun) //make enum
@@ -147,13 +136,12 @@ namespace Warship_1684
         _missileNumber = 12;
       }
   }
-
-    /// <summary> // <- USE THESE PLEASE
-    /// bleh
-    /// </summary>
-    /// <param name="numRounds"></param>
-    /// <param name="gun"></param>
-    /// <returns></returns>
+  /// <summary>
+  /// Outputs the damage to player ship and changes structure
+  /// </summary>
+  /// <param name="numRounds"></param>
+  /// <param name="gun"></param>
+  /// <returns></returns>
     public int Hit(int numRounds, string gun)
     {
       int damage = 0;
@@ -180,7 +168,7 @@ namespace Warship_1684
         //case default:
          // Console.WriteLine("Invalid gun type. Error 700.");
       }
-      _structure = _structure - damage;
+      _structure = _structure - damage; // add consideration for armor
       return _structure;
     }
     public int GetStructure()
@@ -208,6 +196,11 @@ namespace Warship_1684
       }
       return accel;
     }
+    /// <summary>
+    /// Outputs the shooting data for self
+    /// </summary>
+    /// <param name="distance"></param>
+    /// <returns></returns>
     public int Shoot(double distance)
     {
       int shots = 0;
@@ -324,6 +317,10 @@ namespace Warship_1684
       }
       return gun;
     }
+    /// <summary>
+    /// Allows for constant acceleration to either get closer or farther from the enemy
+    /// </summary>
+    /// <param name="toward"></param>
     public void BurnDirec(bool toward)
     {
       if (Globals.ConstAcceleration == true)
@@ -391,39 +388,37 @@ namespace Warship_1684
         string playSelection = "Null";
         bool burnDirec = true;
         playSelection = Console.ReadLine();
-        if (playSelection == "exit") //use a switch case
+        switch (playSelection) //use a switch case
         {
-          Globals.MainLoop = false;
+          case "exit":
+            Globals.MainLoop = false;
+            break;
+          case "Burn Far":
+            Globals.ConstAcceleration = true;
+            burnDirec = true;
+            break;
+          case "Burn Cls":
+            Globals.ConstAcceleration = true;
+            burnDirec = false;
+            break;
+          case "Cut Burn":
+            Globals.ConstAcceleration = false;
+            break;
+          case "Fire":
+            int shotsToEnemy = Globals.PlayerShip.Shoot(Globals.TruDist);
+            Globals.EnemyHit(shotsToEnemy, Globals.PlayerShip.GetGun());
+            break;
+          case "Missile":
+            Console.WriteLine("Number of Missiles to be fired: ");
+            string missileAmount = Console.ReadLine();
+            int missileAmountInt = int.Parse(missileAmount);
+            //Globals.MissileTransitFri = missileAmountInt;
+            Globals.PlayerShip.FireMissile(missileAmountInt);
+            Console.WriteLine($"Number of Missiles fired: {Globals.MissileTransitFri}");
+            Console.WriteLine(Globals.EnemyShipHealth);
+            break;
         }
-        else if (playSelection == "Burn Far")
-        {
-          Globals.ConstAcceleration = true;
-          burnDirec = true;
-        }
-        else if (playSelection == "Burn Cls")
-        {
-          Globals.ConstAcceleration = true;
-          burnDirec = false;
-        }
-        else if (playSelection == "Cut Burn")
-        {
-          Globals.ConstAcceleration = false;
-        }
-        else if (playSelection == "Fire")
-        {
-          int shotsToEnemy = Globals.PlayerShip.Shoot(Globals.TruDist);
-          Globals.EnemyHit(shotsToEnemy, Globals.PlayerShip.GetGun());
-        }
-        else if (playSelection == "Missile")
-        {
-          Console.WriteLine("Number of Missiles to be fired: ");
-          string missileAmount = Console.ReadLine();
-          int missileAmountInt = int.Parse(missileAmount);
-          //Globals.MissileTransitFri = missileAmountInt;
-          Globals.PlayerShip.FireMissile(missileAmountInt);
-          Console.WriteLine($"Number of Missiles fired: {Globals.MissileTransitFri}");
-          Console.WriteLine(Globals.EnemyShipHealth);
-        }
+        Console.WriteLine("speed:", Globals.Speed);
         Globals.PlayerShip.BurnDirec(burnDirec);
         Globals.MissileResolve();
         Console.WriteLine($"The enemy ship is at {Globals.EnemyShipHealth} health");

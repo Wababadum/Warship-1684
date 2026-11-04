@@ -13,6 +13,7 @@ namespace Warship_1684
     public static bool MainLoop = false;
     public static int EnemyShipHealth = 10000;
     public static bool ConstAcceleration;
+    public static bool HardBurn;
     public static void DistanceVisual()
     {
       long displayDist = TruDist / 500000;
@@ -264,6 +265,10 @@ namespace Warship_1684
       {
         shots = shots / 2;
       }
+      if (Globals.HardBurn == true)
+      {
+        shots = shots / 2;
+      }
       return shots;
     }
     public void DissipateHeat()
@@ -325,14 +330,18 @@ namespace Warship_1684
     {
       if (Globals.ConstAcceleration == true)
       {
+        
+      }
+      else if (Globals.HardBurn == true)
+      {
         if (toward == true)
         {
-          Globals.ConstAccel(_acceleration);
+          Globals.ConstAccel(_acceleration * 2);
         }
         else
         {
           int negAccel = -_acceleration;
-          Globals.ConstAccel(negAccel);
+          Globals.ConstAccel(negAccel * 2);
         }
       }
     }
@@ -346,6 +355,7 @@ namespace Warship_1684
       Console.WriteLine("|      Warship 1684      |");
       Console.WriteLine("|------------------------|\n");
       string shipSelection = "Null";
+      bool burnDirec = false;
       while (shipSelection == "Null")
       {
         Console.WriteLine("Please Select Your Ship Class:");
@@ -386,9 +396,8 @@ namespace Warship_1684
         Console.WriteLine(Globals.TruDist);
         Globals.DistanceVisual();
         string playSelection = "Null";
-        bool burnDirec = true;
         playSelection = Console.ReadLine();
-        switch (playSelection) //use a switch case
+        switch (playSelection)
         {
           case "exit":
             Globals.MainLoop = false;
@@ -401,8 +410,13 @@ namespace Warship_1684
             Globals.ConstAcceleration = true;
             burnDirec = false;
             break;
+          case "Hard Burn":
+            Globals.ConstAcceleration = false;
+            Globals.HardBurn = true;
+            break;
           case "Cut Burn":
             Globals.ConstAcceleration = false;
+            Globals.HardBurn = false;
             break;
           case "Fire":
             int shotsToEnemy = Globals.PlayerShip.Shoot(Globals.TruDist);
@@ -424,7 +438,13 @@ namespace Warship_1684
         Console.WriteLine($"The enemy ship is at {Globals.EnemyShipHealth} health");
         Globals.DistanceChange();
         Globals.PlayerShip.DissipateHeat();
+        if (Globals.EnemyShipHealth <= 0)
+        {
+          Globals.MainLoop = false;
+        }
       }
+      Console.Clear();
+      Console.WriteLine("The Enemy has been destroyed!");
     }
   }
   public enum GunType 
